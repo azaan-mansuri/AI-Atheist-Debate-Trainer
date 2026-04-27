@@ -175,7 +175,7 @@ class LoginRequest(BaseModel):
 # GROQ API Setup
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 if not GROQ_API_KEY:
-    print("⚠️ WARNING: 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 not found in environment variables!")
+    print("⚠️ WARNING: GROQ_API_KEY not found in environment variables!")
     GROQ_API_KEY = ""  # Empty fallback
 
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
