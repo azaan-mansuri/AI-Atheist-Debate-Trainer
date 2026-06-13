@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 
-const API_URL = 'https://debate-backend-78i0.onrender.com';
+const API_URL = '';
 
 
 export default function LoginPage() {  
