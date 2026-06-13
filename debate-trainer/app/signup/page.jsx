@@ -2,18 +2,41 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+
+// BACKEND URL
+const API_URL = 'https://debate-backend-78i0.onrender.com';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('teacher');
+  const [isScholar, setIsScholar] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    
+    if (!isScholar) {
+      setError('You must confirm that you are a scholar to continue');
+      setLoading(false);
+      return;
+    }
+    
+    if (!isValidEmail(email)) {
+      setError('Please enter a valid email address');
+      setLoading(false);
+      return;
+    }
     
     if (password.length < 6) {
       setError('Password must be at least 6 characters');
@@ -22,23 +45,44 @@ export default function SignupPage() {
     }
     
     try {
-      const res = await fetch('/api/auth/signup', {
+      const res = await fetch(`${API_URL}/api/auth/signup`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ email, password, role })
       });
       
       const data = await res.json();
+      console.log('Signup Response:', data);
       
       if (data.success) {
+        // Clear old data first
+        localStorage.clear();
+        
+        // Fix: If role missing, add it
+        if (!data.user.role) {
+          data.user.role = role;
+        }
+        
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
-        router.push('/dashboard');
+        
+        console.log('Account created with role:', data.user.role);
+        
+        // Force hard reload with window.location
+        if (data.user.role === 'teacher') {
+          window.location.href = '/dashboard/classroom';
+        } else {
+          window.location.href = '/dashboard';
+        }
       } else {
-        setError(data.error || 'Signup failed');
+        setError(data.detail || 'Signup failed');
       }
     } catch (err) {
-      setError('Network error. Please try again.');
+      console.error('Signup error:', err);
+      setError('Cannot connect to server. Make sure backend is running');
     } finally {
       setLoading(false);
     }
@@ -47,85 +91,55 @@ export default function SignupPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'radial-gradient(circle at 0% 0%, #0f0c29, #302b63, #24243e)',
+      background: '#000000',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       padding: '20px',
-      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+      fontFamily: "'Inter', sans-serif",
     }}>
-      
-      {/* Animated Background Orbs */}
-      <div style={{
-        position: 'fixed', top: '-20%', right: '-10%', width: '400px', height: '400px',
-        background: 'radial-gradient(circle, rgba(102,126,234,0.4), transparent)',
-        borderRadius: '50%', filter: 'blur(80px)', animation: 'float 12s infinite'
-      }}></div>
-      <div style={{
-        position: 'fixed', bottom: '-20%', left: '-10%', width: '500px', height: '500px',
-        background: 'radial-gradient(circle, rgba(118,75,162,0.4), transparent)',
-        borderRadius: '50%', filter: 'blur(100px)', animation: 'float 15s infinite reverse'
-      }}></div>
-
-      <div style={{
-        maxWidth: '480px',
-        width: '100%',
-        background: 'rgba(15,25,45,0.6)',
-        backdropFilter: 'blur(20px)',
-        borderRadius: '32px',
-        border: '1px solid rgba(255,255,255,0.08)',
-        padding: '48px 40px',
-        boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
-        position: 'relative',
-        zIndex: 10
-      }}>
-        
-        {/* Logo / Icon */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        style={{
+          maxWidth: '480px',
+          width: '100%',
+          background: '#0a0a0a',
+          borderRadius: '32px',
+          border: '1px solid #222222',
+          padding: '48px 40px',
+        }}
+      >
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <div style={{
-            width: '72px',
-            height: '72px',
-            background: 'linear-gradient(135deg, #667eea, #764ba2)',
-            borderRadius: '20px',
+            width: '80px',
+            height: '80px',
+            background: 'linear-gradient(135deg, #10a37f, #1a7f64)',
+            borderRadius: '24px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '36px',
+            fontSize: '40px',
             margin: '0 auto 20px',
-            boxShadow: '0 8px 20px rgba(102,126,234,0.3)'
           }}>
-            🎙️
+            🎓
           </div>
           <h1 style={{
-            fontSize: '32px',
+            fontSize: '34px',
             fontWeight: '700',
             margin: 0,
-            background: 'linear-gradient(135deg, #ffffff, #a0a0ff)',
+            background: 'linear-gradient(135deg, #ffffff, #10a37f)',
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
-            color: 'transparent'
+            color: 'transparent',
           }}>
-            Join the Debate
+            Create Account
           </h1>
-          <p style={{
-            fontSize: '14px',
-            color: 'rgba(255,255,255,0.5)',
-            marginTop: '8px'
-          }}>
-            Create your account to start training
-          </p>
         </div>
 
-        {/* Signup Form */}
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '20px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '13px',
-              fontWeight: '500',
-              color: 'rgba(255,255,255,0.7)',
-              marginBottom: '6px'
-            }}>
+            <label style={{ display: 'block', fontSize: '13px', color: '#aaaaaa', marginBottom: '8px' }}>
               Email Address
             </label>
             <input
@@ -137,49 +151,87 @@ export default function SignupPage() {
               style={{
                 width: '100%',
                 padding: '14px 18px',
-                background: 'rgba(0,0,0,0.3)',
-                border: '1px solid rgba(255,255,255,0.1)',
+                background: '#1a1a1a',
+                border: '1px solid #333333',
                 borderRadius: '16px',
-                color: 'white',
+                color: '#ffffff',
                 fontSize: '15px',
                 outline: 'none',
-                transition: 'all 0.2s'
               }}
-              onFocus={(e) => e.target.style.borderColor = '#667eea'}
-              onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
             />
           </div>
 
-          <div style={{ marginBottom: '24px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '13px',
-              fontWeight: '500',
-              color: 'rgba(255,255,255,0.7)',
-              marginBottom: '6px'
-            }}>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', fontSize: '13px', color: '#aaaaaa', marginBottom: '8px' }}>
               Password
             </label>
             <input
               type="password"
-              placeholder="Create a strong password"
+              placeholder="Min 6 characters"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               style={{
                 width: '100%',
                 padding: '14px 18px',
-                background: 'rgba(0,0,0,0.3)',
-                border: '1px solid rgba(255,255,255,0.1)',
+                background: '#1a1a1a',
+                border: '1px solid #333333',
                 borderRadius: '16px',
-                color: 'white',
+                color: '#ffffff',
                 fontSize: '15px',
                 outline: 'none',
-                transition: 'all 0.2s'
               }}
-              onFocus={(e) => e.target.style.borderColor = '#667eea'}
-              onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
             />
+          </div>
+
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', fontSize: '13px', color: '#aaaaaa', marginBottom: '8px' }}>
+              Account Type
+            </label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '14px 18px',
+                background: '#1a1a1a',
+                border: '1px solid #333333',
+                borderRadius: '16px',
+                color: '#ffffff',
+                fontSize: '15px',
+                outline: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="student">📚 Student - Join classrooms</option>
+              <option value="teacher">👨‍🏫 Teacher - Create classrooms</option>
+            </select>
+          </div>
+
+          <div style={{ 
+            marginBottom: '24px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            background: isScholar ? 'rgba(16,163,127,0.1)' : '#1a1a1a',
+            padding: '12px 16px',
+            borderRadius: '12px',
+            border: `1px solid ${isScholar ? 'rgba(16,163,127,0.4)' : '#333333'}`,
+            cursor: 'pointer'
+          }}
+          onClick={() => setIsScholar(!isScholar)}
+          >
+            <input
+              type="checkbox"
+              id="isScholar"
+              checked={isScholar}
+              onChange={(e) => setIsScholar(e.target.checked)}
+              onClick={(e) => e.stopPropagation()}
+              style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#10a37f' }}
+            />
+            <label htmlFor="isScholar" style={{ color: '#aaaaaa', fontSize: '13px', cursor: 'pointer', flex: 1 }}>
+              I confirm that I am a <span style={{ color: '#10a37f', fontWeight: '600' }}>Scholar</span>
+            </label>
           </div>
 
           {error && (
@@ -199,72 +251,33 @@ export default function SignupPage() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !isScholar}
             style={{
               width: '100%',
               padding: '14px',
-              background: 'linear-gradient(135deg, #667eea, #764ba2)',
+              background: 'linear-gradient(135deg, #10a37f, #1a7f64)',
               color: 'white',
               border: 'none',
               borderRadius: '40px',
               fontSize: '16px',
               fontWeight: '600',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.7 : 1,
-              transition: 'transform 0.2s',
-              boxShadow: '0 4px 15px rgba(102,126,234,0.3)'
+              cursor: (loading || !isScholar) ? 'not-allowed' : 'pointer',
+              opacity: (loading || !isScholar) ? 0.5 : 1,
             }}
           >
-            {loading ? (
-              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                <span style={{
-                  width: '16px',
-                  height: '16px',
-                  border: '2px solid white',
-                  borderTop: '2px solid transparent',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite',
-                  display: 'inline-block'
-                }}></span>
-                Creating account...
-              </span>
-            ) : (
-              'Create Account →'
-            )}
+            {loading ? 'Creating account...' : 'Create Account →'}
           </button>
         </form>
 
-        {/* Login link */}
-        <div style={{
-          marginTop: '32px',
-          paddingTop: '24px',
-          borderTop: '1px solid rgba(255,255,255,0.05)',
-          textAlign: 'center'
-        }}>
-          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px' }}>
+        <div style={{ marginTop: '32px', textAlign: 'center' }}>
+          <p style={{ color: '#888888', fontSize: '13px' }}>
             Already have an account?{' '}
-            <a href="/login" style={{
-              color: '#a78bfa',
-              textDecoration: 'none',
-              fontWeight: '500',
-              transition: 'color 0.2s'
-            }}>
+            <a href="/login" style={{ color: '#10a37f', textDecoration: 'none', fontWeight: '600' }}>
               Sign in
             </a>
           </p>
         </div>
-      </div>
-
-      <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-20px) rotate(5deg); }
-        }
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
+      </motion.div>
     </div>
   );
 }

@@ -1,10 +1,12 @@
 ﻿import { NextResponse } from 'next/server';
 
+const API_URL = ''; 
+
 export async function POST(request) {
   try {
     const { messages } = await request.json();
     
-    const response = await fetch('http://localhost:8001/api/debate', {
+    const response = await fetch(`${API_URL}/api/debate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ messages }),
@@ -16,7 +18,7 @@ export async function POST(request) {
   } catch (error) {
     console.error('API error:', error);
     return NextResponse.json({ 
-      reply: 'Backend connection failed. Make sure Python server is running on port 8001' 
+      reply: 'Backend connection failed. Make sure Python server is running' 
     });
   }
 }

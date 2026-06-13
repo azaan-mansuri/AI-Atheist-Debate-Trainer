@@ -1,0 +1,23 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://debate-backend-78i0.onrender.com/api/$1"
+    },
+    {
+      "source": "/xk9m2p5q8t1w4z7/(.*)",
+      "destination": "https://debate-backend-78i0.onrender.com/xk9m2p5q8t1w4z7/$1"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Permissions-Policy",
+          "value": "microphone=(self)"
+        }
+      ]
+    }
+  ]
+}
