@@ -653,24 +653,7 @@ useEffect(() => {
     📊 My Progress
   </button>
 
-  <button
-  onClick={saveReviewToDatabase}
-  style={{
-    padding: '8px 16px',
-    backgroundColor: '#10a37f',
-    border: 'none',
-    borderRadius: '20px',
-    color: '#fff',
-    cursor: 'pointer',
-    fontSize: '13px',
-    fontWeight: '500',
-    transition: 'all 0.2s ease'
-  }}
-  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#1a7f64'; }}
-  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#10a37f'; }}
->
-  💾 Save Review
-</button>
+  
             {/* Language Switcher */}
             <div style={{ display: 'flex', gap: '6px', backgroundColor: '#1a1a1a', borderRadius: '24px', padding: '4px', border: '1px solid #333' }}>
               <button
