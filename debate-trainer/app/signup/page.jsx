@@ -72,11 +72,7 @@ export default function SignupPage() {
         console.log('Account created with role:', data.user.role);
         
         // Force hard reload with window.location
-        if (data.user.role === 'teacher') {
-          window.location.href = '/dashboard/classroom';
-        } else {
-          window.location.href = '/dashboard';
-        }
+       window.location.href = '/dashboard';
       } else {
         setError(data.detail || 'Signup failed');
       }

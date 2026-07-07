@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 
-const API_URL = '';
-
+// ✅ FIX: Backend URL daalo
+const API_URL = 'https://debate-backend-78i0.onrender.com';
 
 export default function LoginPage() {  
   const [email, setEmail] = useState('');
@@ -37,11 +37,13 @@ export default function LoginPage() {
     }
     
     try {
-      // ✅ LOGIN API — signup nahi
+      // ✅ LOGIN API
       const res = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify({ email, password })
       });
       
@@ -49,23 +51,23 @@ export default function LoginPage() {
       console.log('📝 Login Response:', data);
       
       if (data.success) {
+        // ✅ Clear old data
+        localStorage.clear();
+        
+        // ✅ Store new data
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         
         console.log('✅ User logged in with role:', data.user?.role);
         
-        // ✅ Redirect based on role
-        if (data.user?.role === 'teacher') {
-          window.location.href = '/dashboard/classroom';
-        } else {
-          window.location.href = '/dashboard';
-        }
+        // ✅ Sab users ko dashboard pe bhejo (teacher bhi)
+        window.location.href = '/dashboard';
       } else {
-        setError('Invalid email or password');
+        setError(data.detail || 'Invalid email or password');
       }
     } catch (err) {
       console.error('Login error:', err);
-      setError('Cannot connect to server');
+      setError('Cannot connect to server. Please try again.');
     } finally {
       setLoading(false);
     }

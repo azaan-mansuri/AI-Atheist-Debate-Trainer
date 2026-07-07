@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+
 interface Config {
   mode: string;
   persona: string;
@@ -35,6 +36,7 @@ export default function Dashboard() {
   const [hasJoinedClass, setHasJoinedClass] = useState(false);
   const [joinedClassInfo, setJoinedClassInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
   
   // Personas data
   const personas = [
@@ -340,7 +342,7 @@ if (entryMode === 'student-debate') {
               Choose your persona, topic, and difficulty level. Your teacher will track your progress.
             </p>
             <div style={{ marginTop: '24px', color: '#f59e0b', fontSize: '15px', fontWeight: '500' }}>
-              Select Settings →
+              Let's Debate →
             </div>
           </button>
 
@@ -382,42 +384,72 @@ if (entryMode === 'student-debate') {
       
       {/* Header */}
       <div style={{
-        position: 'sticky',
-        top: 0,
-        zIndex: 50,
-        backgroundColor: '#0a0a0a',
-        borderBottom: '1px solid #2d2d3a',
-        padding: '16px 24px'
-      }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#fff', margin: 0 }}>
-              AI Atheism Debate Simulator
-            </h1>
-            <p style={{ fontSize: '14px', color: '#888', marginTop: '4px' }}>
-              AI-powered training for scholars & students of knowledge
-            </p>
-          </div>
-          {hasJoinedClass && user?.role === 'student' && (
-            <button
-              onClick={() => setEntryMode('student-debate')}
-              style={{
-                padding: '8px 20px',
-                backgroundColor: '#10a37f',
-                border: 'none',
-                borderRadius: '40px',
-                color: '#fff',
-                cursor: 'pointer',
-                fontSize: '13px',
-                fontWeight: '500'
-              }}
-            >
-              🏫 Go to Classroom
-            </button>
-          )}
-        </div>
-      </div>
-
+  position: 'sticky',
+  top: 0,
+  zIndex: 50,
+  backgroundColor: '#0a0a0a',
+  borderBottom: '1px solid #2d2d3a',
+  padding: '16px 24px'
+}}>
+  <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+    <div>
+      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#fff', margin: 0 }}>
+        AI Atheism Debate Simulator
+      </h1>
+      <p style={{ fontSize: '14px', color: '#888', marginTop: '4px' }}>
+        AI-powered training for scholars & students of knowledge
+      </p>
+    </div>
+    
+    <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+      
+      {/* ✅ MY PROGRESS BUTTON - YAHAN ADD KARO */}
+      <button 
+        onClick={() => router.push('/individual-progress')} 
+        style={{
+          padding: '8px 20px',
+          backgroundColor: '#1a1a1a',
+          border: '1px solid #10a37f',
+          borderRadius: '40px',
+          color: '#10a37f',
+          cursor: 'pointer',
+          fontSize: '13px',
+          fontWeight: '500',
+          transition: 'all 0.2s ease',
+          whiteSpace: 'nowrap'
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#10a37f20'; }}
+        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#1a1a1a'; }}
+      >
+        📊 My Progress
+      </button>
+      
+      {/* Classroom Button */}
+      {hasJoinedClass && user?.role === 'student' && (
+        <button
+          onClick={() => setEntryMode('student-debate')}
+          style={{
+            padding: '8px 20px',
+            backgroundColor: '#1a1a1a',
+            border: '1px solid #f59e0b',
+            borderRadius: '40px',
+            color: '#f59e0b',
+            cursor: 'pointer',
+            fontSize: '13px',
+            fontWeight: '500',
+            transition: 'all 0.2s ease',
+            whiteSpace: 'nowrap'
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f59e0b20'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#1a1a1a'; }}
+        >
+          🏫 Go to Classroom
+        </button>
+      )}
+      
+    </div>
+  </div>
+</div>
       {/* Main Content */}
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 24px' }}>
         
